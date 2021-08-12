@@ -27,6 +27,7 @@
                     name:'',
                     password:''
                 },
+                //表单输入规定
                 rules:{
                     name:[
                         { required: true, message: '请输入名称', trigger: 'blur' },
