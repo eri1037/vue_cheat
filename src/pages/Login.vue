@@ -34,7 +34,7 @@
                         { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
                     ],
                     password: [
-                        { required: true, message: '请输入名称', trigger: 'blur' },
+                        { required: true, message: '请输入密码', trigger: 'blur' },
                         { min: 6, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
                     ]
                 }
@@ -44,7 +44,19 @@
             onSubmit(){
                 this.$refs.loginForm.validate((val) => {
                     if (val)
-                        console.log(this.form)
+                        this.$http.get('/login', {params:{name:this.form.name, password:this.form.password}})
+                            .then((res)=>{
+                                if (res.data.status===0){
+                                    sessionStorage.setItem('token', res.data.token)
+                                    console.log(this)
+                                    this.$router.push('/home')
+                                }
+                                else if (res.data.status===-1){
+                                    console.log('账号或密码错误')
+                                }
+                            }).catch((err)=>{
+                            console.log(err)
+                        })
                 })
 
             },

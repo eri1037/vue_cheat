@@ -12,13 +12,13 @@ const router =  new VueRouter({
     ]
 })
 //前置路由守卫
-router.beforeEach((to, from, next) => {
+/*router.beforeEach((to, from, next) => {
     if (to.path === '/login')
         return next()
     const token = sessionStorage.getItem('token')
     if (!token)
         return next('/login')
     next()
-})
+})*/
 
 export default router
