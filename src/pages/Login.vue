@@ -8,7 +8,7 @@
                 <el-input v-model="form.name" prefix-icon="el-icon-user-solid"></el-input>
             </el-form-item>
             <el-form-item prop="password">
-                <el-input v-model="form.password" prefix-icon="el-icon-lock"></el-input>
+                <el-input type="password" v-model="form.password" prefix-icon="el-icon-lock"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button @click="onReset">重置</el-button>
@@ -24,8 +24,8 @@
         data(){
             return{
                 form:{
-                    name:'',
-                    password:''
+                    name:'zzs',
+                    password:'123456'
                 },
                 //表单输入规定
                 rules:{
@@ -44,18 +44,18 @@
             onSubmit(){
                 this.$refs.loginForm.validate((val) => {
                     if (val)
-                        this.$http.get('/login', {params:{name:this.form.name, password:this.form.password}})
+                        this.$http.get('/starry/login', {params:{name:this.form.name, password:this.form.password}})
                             .then((res)=>{
                                 if (res.data.status===0){
                                     sessionStorage.setItem('token', res.data.token)
-                                    console.log(this)
                                     this.$router.push('/home')
                                 }
                                 else if (res.data.status===-1){
-                                    console.log('账号或密码错误')
+                                    this.$message.error('账号或密码错误')
                                 }
                             }).catch((err)=>{
-                            console.log(err)
+                                this.$message.error('连接服务器失败.')
+                                console.log(err)
                         })
                 })
 
