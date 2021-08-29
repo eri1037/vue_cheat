@@ -3,7 +3,7 @@
         <ul>
             <li v-for="(message, index) in messageList" :key='index' :class="message.own===false?'left':'right'">
                 <span class="header" :style="{background:message.color}"></span>
-                <div class="text">{{message.msg}}</div> 
+                <p class="text" v-html="message.msg"></p> 
             </li>
         </ul>
     </div>
@@ -15,15 +15,21 @@
         data(){
             return {
                 messageList:[
-                    {own:true, msg:'1234567895', color:'red'},
+                    {own:true, msg:'sdfs&#8986;sdf', color:'red'},
                     {own:false, msg:'456789123213123213', color:'blue'},
-                    {own:true, msg:'456789123213123213456789123213123213456789123213123213456789123213123213', color:'red'},
+                    {own:true, msg:'456789%123213123213456789123213123213456789123213123213456789123213123213', color:'red'},
                     {own:false, msg:'456789123213123213456789123213123213456789123213123213456789123213123213', color:'yellow'},
                 ],
             }
         },
+        methods:{
+            pushData(data){
+                this.messageList.push(data)
+            }
+        },
         mounted(){
             console.log(this.messageList[0].msg)
+            this.$bus.$on('sendMsg', this.pushData)
         }
     }
 </script>

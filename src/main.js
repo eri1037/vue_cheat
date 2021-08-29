@@ -20,7 +20,12 @@ Vue.config.productionTip = false
 
 Vue.prototype.$http = axios
 Vue.prototype.$message = ElementUI.Message
+
+
 new Vue({
   render: h => h(App),
-  router:router
+  router:router,
+  beforeCreate(){
+    Vue.prototype.$bus = this
+  }
 }).$mount('#app')

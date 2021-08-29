@@ -1,6 +1,7 @@
 <template>
     <div>
-        <el-input style='width:200px' v-model="input"/>
+        <EmojiInputVue/>
+        <el-input style='width:200px' v-model="input" type="textarea"/>
         <el-button @click="send">发送消息2</el-button>
         <h1>{{msg}}</h1>
         <Message/>
@@ -8,19 +9,20 @@
 </template>
 
 <script>
+    import EmojiInputVue from './EmojiInput'
     import Message from './Message'
     export default {
         name:'SocketIO',
-        components: {Message},
+        components: {Message,EmojiInputVue},
         data(){
             return{
                 msg:'',
-                input:''
+                input:'&#65;'
             }
         },
         methods:{
             send(){
-                this.$socket.emit('sendMsg', {msg:this.input})
+                this.$socket.emit('sendMsg', {msg:this.input, color:'red'})
             }
         },
         sockets:{
@@ -28,8 +30,8 @@
                 console.log('链接成功')
             },
             getMsg(msg){
-                console.log(msg)
-                this.msg = msg
+                console.log(this.input.codePointAt(0).toString(16))
+                this.$bus.$emit('sendMsg', msg)
             }
         },
         mounted(){
