@@ -1,9 +1,14 @@
 <template>
   <div>
-        <Emoji/>
         <el-input style='width:200px' v-model='input' type="textarea"/>
-        <el-button icon="el-icon-search" circle @click="add"></el-button>
         <el-button @click="send">发送消息2</el-button>
+        <el-button icon="el-icon-search" circle @click="add"></el-button>  
+        <el-upload
+            action="http://127.0.0.1:8888/uploadImg"
+            >
+            <el-button icon="el-icon-folder-add" circle></el-button>
+        </el-upload>
+        <Emoji/>
   </div>
 </template>
 
@@ -18,8 +23,10 @@
             }
         },
         methods:{
+            //向服务器发送数据
             send(){
-                console.log(this.input)
+                this.$socket.emit('sendMsg', {token:sessionStorage.getItem('token'), msg:this.utf16toEntities(this.input)})
+                this.input = ''
             },
             add(){
                 this.input += '表情😀123456;'
@@ -74,6 +81,17 @@
                     strObj = strObj.replace(code, s);
                 }
                 return strObj;
+            }
+        },
+        sockets:{
+            connect(){
+                console.log('链接成功')
+            },
+            //服务器返回来的数据
+            getMsg(msg){
+                //将数据发送给Message模块
+                msg.msg = this.entitiestoUtf16(msg.msg)
+                this.$bus.$emit('sendMsg', msg)
             }
         },
         mounted(){

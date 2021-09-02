@@ -22,7 +22,7 @@ export default {
     },
     mounted(){
         let i = 128516
-        while(i<128520){
+        while(i<128530){
             this.emojiList.push(`&#${i++};`)
         }
     }
