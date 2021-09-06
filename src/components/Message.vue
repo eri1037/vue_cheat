@@ -1,120 +1,90 @@
 <template>
-    <div class="content">
-        <ul>
-            <li v-for="(message, index) in messageList" :key='index' :class="message.own===false?'left':'right'">
-                <span class="header" :style="{background:message.color}"></span>
-                <p class="text" >{{message.msg}}<img v-if="message.imgURL !== null" :src=message.imgURL /></p>
-                <span class="time">{{message.time}}</span>
-            </li>
-        </ul>
+    <div>
+        <div class="chat-name">{{chatName}}</div>
+        <div class="content"> 
+            <MessageStru v-for="(message, index) in messageList" :key="index" :message="message"  :imgList="imgList" :class="message.own===false?'left':'right'" />
+        </div>
     </div>
+    
 </template>
 
 <script>
+    import MessageStru from '../components/MessageStru'
     export default {
         name:'Message',
+        components:{MessageStru},
         data(){
             return {
                 messageList:[
-                    {own:true, msg:'sdfs&#8986;sdf', imgURL:require('../assets/logo.png'), color:'red', time:'22:24'},
-                    {own:false, msg:'456789123213123213', imgURL:null, color:'blue', time:'22:24'},
-                    {own:true, msg:'456789%123213123213456789123213123213456789123213123213456789123213123213', imgURL:null, color:'red', time:'22:24'},
-                    {own:false, msg:'456789123213123213456789123213123213456789123213123213456789123213123213', imgURL:null, color:'yellow', time:'22:24'},
+                    {own:true, type:'text', content:'sdfs&#8986;sdf', name:'cxk', header:'http://127.0.0.1:8888/getImg?fileName=/static/image/85143613_p0-1630933076686.jpg', time:'22:24'},
+                    {own:false, type:'text', content:'456789123213123213', name:'cxk', header:require('../assets/logo.png'), time:'22:24'},
+                    {own:true, type:'image', content:'http://127.0.0.1:8888/getImg?fileName=/static/image/85143613_p0-1630933076686.jpg', name:'cxk', header:require('../assets/logo.png'), time:'22:24'},
+                    {own:false, type:'image', content:'http://127.0.0.1:8888/getImg?fileName=/static/image/85163754_p0-1630935632542.jpg', name:'cxk', header:require('../assets/logo.png'), time:'22:24'},
+                    {own:true, type:'text', content:'sdfs&#8986;sdf', name:'cxk', header:'http://127.0.0.1:8888/getImg?fileName=/static/image/85143613_p0-1630933076686.jpg', time:'22:24'},
+                    {own:false, type:'text', content:'456789123213123213', name:'cxk', header:require('../assets/logo.png'), time:'22:24'},
+                    {own:true, type:'image', content:'http://127.0.0.1:8888/getImg?fileName=/static/image/85143613_p0-1630933076686.jpg', name:'cxk', header:require('../assets/logo.png'), time:'22:24'},
+                    {own:false, type:'image', content:'http://127.0.0.1:8888/getImg?fileName=/static/image/85163754_p0-1630935632542.jpg', name:'cxk', header:require('../assets/logo.png'), time:'22:24'},
                 ],
+                imgList:[
+                    'http://127.0.0.1:8888/getImg?fileName=/static/image/85143613_p0-1630933076686.jpg',
+                    'http://127.0.0.1:8888/getImg?fileName=/static/image/85163754_p0-1630935632542.jpg'
+                ],
+                chatName:'聊天室'
             }
         },
         methods:{
             pushData(data){
                 this.messageList.push(data)
+            },
+            changeMessagePage(path){
+                console.log('SocketIO:', path)
+                //向服务器发送朋友id获取消息内容
+                this.$http.get('/starry/getChatMessage', {params:{token:sessionStorage.getItem('token'), reciver:path}})
+                .then(res => {
+                    console.log(res.data)
+                    this.chatName = res.data.reciver
+                    this.messageList = res.data.messageList
+                    this.imgList = res.data.imgList
+                }).catch(error => {
+                    console.log(error)
+                })
             }
         },
         sockets:{
             getImg(data){
                 this.messageList.push(data)
+                this.imgList.push(data.content)
+                console.log(this.imgList)
             }
         },
         mounted(){
-            console.log(this.messageList[0].msg)
             this.$bus.$on('sendMsg', this.pushData)
+            //接收Nav发送过来的朋友id
+            this.$bus.$on('selectFriend', this.changeMessagePage)
         },
     }
 </script>
 
 <style scoped>
 .content{
-    width: 600px;
-    height: 300px;
+    width: 100%;
+    height:90%;
     background: gray;
     overflow-y: scroll;
-    overflow-x: hidden;
-    left: 50%;
-    transform: translateX(-50%);
+    overflow-x: hidden; 
     position: relative;
 }
 
-li{
+.content::-webkit-scrollbar{
+    display: none;
+}
+
+.chat-name{
     width: 100%;
-    margin: 10px 0;
-    display: flex;
-}
-
-img{
-    max-width: 100px;
-    max-height: 100px;
-}
-
-.left{
+    height: 5%;
     text-align: left;
-    padding-left: 10px;
+    font-size: 20px;
+    padding: 5px;
 }
 
-.right{
-    justify-content: flex-end;
-}
-
-.header{
-    width: 50px;
-    height: 50px;
-    display: inline-block;
-    border-radius: 50px;
-}
-
-.text{
-    max-width: 400px;
-    padding: 15px;
-    word-wrap: break-word;
-    word-break: break-all;
-    border-radius: 10px;
-}
-
-.left .text{
-    background: green;
-    margin-left: 10px;
-}
-
-.right .header{
-    margin-right: 10px;
-    order: 3;
-}
-
-.right .text{
-    margin-right: 10px;
-    text-align: left;
-    background: white;
-    order: 2;
-}
-
-.time{
-    background: rgba(90, 90, 90, 0.3);
-    align-self: flex-end;
-}
-
-.left .time{
-    margin-left: 10px;
-}
-
-.right .time{
-    margin-right: 10px;
-    order: 1;
-}
 </style>

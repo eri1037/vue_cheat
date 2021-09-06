@@ -31,7 +31,7 @@
                 rules:{
                     name:[
                         { required: true, message: '请输入名称', trigger: 'blur' },
-                        { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+                        { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
                     ],
                     password: [
                         { required: true, message: '请输入密码', trigger: 'blur' },
@@ -55,7 +55,6 @@
                                 }
                             }).catch((err)=>{
                                 this.$message.error('连接服务器失败.')
-                                console.log(err)
                         })
                 })
 

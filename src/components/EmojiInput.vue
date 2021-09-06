@@ -1,41 +1,53 @@
 <template>
-  <div>
-        <el-input style='width:200px' v-model='input' type="textarea"/>
-        <el-button @click="send">发送消息2</el-button>
-        <el-button icon="el-icon-search" circle @click="add"></el-button>  
-        <el-upload
-            action="http://127.0.0.1:8888/uploadImg"
-            >
+    <div>
+        <div class="toolbar">
+            <Emoji v-show="showEmoji" class="emoji"/>
+            <el-button icon="el-icon-search" circle @click="add"></el-button> 
             <el-button icon="el-icon-folder-add" circle></el-button>
-        </el-upload>
-        <Emoji/>
+            <el-button icon="el-icon-star-off" circle title="表情" @click="showEmoji=!showEmoji"></el-button>
+            <Upload class="upload"/>
+        </div>
+        <textarea class="message-input" v-model='input'/>
+        <el-button class="send" @click="send">发送</el-button> 
+        
   </div>
 </template>
 
 <script>
     import Emoji from './Emoji'
+    import Upload from './upload'
     export default {
         name:'EmojiInput',
-        components:{Emoji},
+        components:{Emoji, Upload},
         data(){
             return{
-                input:''
+                input:'',
+                showEmoji:false,
+                reciver:''
             }
         },
         methods:{
             //向服务器发送数据
             send(){
-                this.$socket.emit('sendMsg', {token:sessionStorage.getItem('token'), msg:this.utf16toEntities(this.input)})
-                this.input = ''
+                if(this.input.trim() === ''){
+                    this.$message('不能输入空白内容')
+                }else{
+                    //向服务器socket中的sendMsg发送数据
+                    this.$socket.emit('sendMsg', {token:sessionStorage.getItem('token'), msg:this.utf16toEntities(this.input.trim()), reciver:this.reciver})
+                    this.input = ''
+                }   
             },
             add(){
                 this.input += '表情😀123456;'
                 this.input = this.utf16toEntities(this.input)
-                console.log(this.input)
                 this.input = this.entitiestoUtf16(this.input)
             },
             getEmoji(emoji){
                 this.input += this.entitiestoUtf16(emoji)
+            },
+            changeFriend(path){
+                this.reciver = path
+                console.log('changeFriend', path)
             },
             //emoji => utf16
             utf16toEntities(str) {
@@ -90,16 +102,54 @@
             //服务器返回来的数据
             getMsg(msg){
                 //将数据发送给Message模块
-                msg.msg = this.entitiestoUtf16(msg.msg)
+                msg.content = this.entitiestoUtf16(msg.content)
                 this.$bus.$emit('sendMsg', msg)
             }
         },
         mounted(){
+            //Emoji中选择后回调
             this.$bus.$on('selectEmoji', this.getEmoji)
+
+            this.$bus.$on('selectFriend', this.changeFriend)
         }
     }
 </script>
 
 <style scoped>
+.message-input{
+    width: 100%;
+    height: 50px;
+    margin: 5px;
+    border: none;
+    outline: none;
+    resize: none !important;
+    overflow-y:scroll;
 
+}
+
+.message-input::-webkit-scrollbar{
+    display: none;
+}
+
+.toolbar{
+    width: 90%;
+    text-align: left;
+    position: relative;
+}
+.upload{
+    display: inline;
+    width: 100%;
+    height: 100%;
+    margin-left: 10px;
+}
+
+.send{
+    float: right;
+}
+
+.emoji{
+    width: 600px;
+    position: absolute;
+    top: -200px;
+}
 </style>

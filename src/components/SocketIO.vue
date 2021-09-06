@@ -1,8 +1,7 @@
 <template>
     <div>
-        <Upload/>
-        <Message/>
-        <EmojiInputVue/>
+        <Message class="message"/>
+        <EmojiInputVue class="inputArea"/>
     </div>
 </template>
 
@@ -16,16 +15,24 @@
         data(){
             return{
                 msg:'',
-                input:'&#65;'
             }
         }, 
+        methods:{
+            
+        },
         mounted(){
-            this.$socket.emit('hello', {token:sessionStorage.getItem('token')})
+            
+            
         }
     }
 </script>
 
 <style scoped>
-
+.message{
+    height: 70%;
+}
+.inputArea{
+    height: 20%;
+}
 
 </style>
